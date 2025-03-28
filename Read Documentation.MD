@@ -178,17 +178,89 @@ CREATE TABLE Restaurants (
     FOREIGN KEY (OwnerID) REFERENCES Users(UserID)
 );
 
+CREATE TABLE Menus (
+    MenuID INT PRIMARY KEY,
+    ItemName VARCHAR(100) NOT NULL,
+    Description VARCHAR(255),
+    Price DECIMAL(10, 2) NOT NULL,
+    RestaurantID INT NOT NULL,
+    FOREIGN KEY (RestaurantID) REFERENCES Restaurants(RestaurantID)
+);
+
+CREATE TABLE Promotions (
+    PromoID INT PRIMARY KEY,
+    Code VARCHAR(50) UNIQUE NOT NULL,
+    DiscountPercentage DECIMAL(5, 2) NOT NULL,
+    ValidFrom DATETIME NOT NULL,
+    ValidTo DATETIME NOT NULL,
+    Status VARCHAR(20) NOT NULL
+);
+
 CREATE TABLE Orders (
     OrderID INT PRIMARY KEY,
     OrderDate DATETIME NOT NULL,
-    TotalAmount DECIMAL(10,2) NOT NULL,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
     Status VARCHAR(50) NOT NULL,
     CustomerID INT NOT NULL,
     PromoID INT,
     FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
     FOREIGN KEY (PromoID) REFERENCES Promotions(PromoID)
 );
+
+CREATE TABLE OrderItems (
+    OrderItemID INT PRIMARY KEY,
+    OrderID INT NOT NULL,
+    MenuID INT NOT NULL,
+    Quantity INT NOT NULL,
+    ItemPrice DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (MenuID) REFERENCES Menus(MenuID)
+);
+
+CREATE TABLE Payments (
+    PaymentID INT PRIMARY KEY,
+    OrderID INT UNIQUE NOT NULL,
+    PaymentMethod VARCHAR(50) NOT NULL,
+    Amount DECIMAL(10, 2) NOT NULL,
+    Status VARCHAR(20) NOT NULL,
+    TransactionID VARCHAR(100) UNIQUE NOT NULL,
+    Timestamp DATETIME NOT NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+);
+
+CREATE TABLE Deliveries (
+    DeliveryID INT PRIMARY KEY,
+    OrderID INT UNIQUE NOT NULL,
+    AgentID INT NOT NULL,
+    DeliveryStatus VARCHAR(50) NOT NULL,
+    DeliveryDate DATETIME,
+    EstimatedDeliveryTime DATETIME,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (AgentID) REFERENCES DeliveryAgents(AgentID)
+);
+
+CREATE TABLE Reviews (
+    ReviewID INT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    RestaurantID INT NOT NULL,
+    Rating INT NOT NULL,
+    Comment VARCHAR(500),
+    Timestamp DATETIME NOT NULL,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (RestaurantID) REFERENCES Restaurants(RestaurantID)
+);
+
+CREATE TABLE Reports (
+    ReportID INT PRIMARY KEY,
+    ReportType VARCHAR(50) NOT NULL,
+    GeneratedDate DATETIME NOT NULL,
+    GeneratedBy INT NOT NULL,
+    Summary VARCHAR(255) NOT NULL,
+    Details TEXT,
+    FOREIGN KEY (GeneratedBy) REFERENCES Users(UserID)
+);
 ```
+
 
 ---
 
